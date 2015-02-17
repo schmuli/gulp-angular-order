@@ -1,8 +1,6 @@
 var path = require('path');
 var through = require('through2');
 
-var defaultOptions = ;
-
 module.exports = function (options) {
     options = options || {};
 
