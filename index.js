@@ -39,7 +39,14 @@ module.exports = function (options) {
         sorted.sort(function (a, b) {
             var dirSort = a.dir.localeCompare(b.dir);
             var typeSort = compareTypes(a.type, b.type);
-            return dirSort !== 0 ? dirSort : typeSort;
+            var nameSort = a.name.localeCompare(b.name);
+            if (dirSort !== 0) {
+                return dirSort;
+            }
+            if (typeSort !== 0) {
+                return typeSort;
+            }
+            return nameSort;
         });
         
         var result = [];
