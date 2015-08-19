@@ -38,14 +38,14 @@ module.exports = function (options) {
         
         sorted.sort(function (a, b) {
             var dirSort = a.dir.localeCompare(b.dir);
-            var typeSort = compareTypes(a.type, b.type);
-            var nameSort = a.name.localeCompare(b.name);
             if (dirSort !== 0) {
-                return dirSort;
+                return -dirSort;
             }
+            var typeSort = compareTypes(a.type, b.type);
             if (typeSort !== 0) {
                 return typeSort;
             }
+            var nameSort = a.name.localeCompare(b.name);
             return nameSort;
         });
         
@@ -74,11 +74,13 @@ module.exports = function (options) {
     }
     
     function stats(file) {
+        var relative = path.relative(base, file.path);
         var dir = path.dirname(file.relative);
         var name = path.basename(file.relative, '.js');
+        
         return {
             file: file,
-            dir: dir !== '.' ? dir : String.fromCharCode(0xFFF),
+            dir: dir !== '.' ? dir : String.fromCharCode(0x32),
             name: name,
             type: name !== 'module' ? path.extname(name).substr(1) : name
         };
