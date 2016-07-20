@@ -27,8 +27,11 @@ gulp.task('build', function () {
 
 Below is a list of optional options:
 
--   `base`: The relative path to the root of the application. The default is the current directory.
--   `types`: An array of types, in descending order. The default is `['service', 'controller', 'directive', 'filter', 'module']`.
+-   `base`: The relative path to the root of the application. The default is the current directory. An file not under the base path will not be sorted.
+
+-   `types`: An array of types, in descending order. The default order is `['service', 'controller', 'directive', 'filter', 'routes', 'config', 'module']`.
+
+-   `special`: An array of top-level directory names that will always be sorted to the top of resulting file list.
 
 ## `SortFiles` Function
 
@@ -66,7 +69,8 @@ app/
         sessions.module.js
 ```
 
-The plugin will then order the folders based on folder depth, so that child folders are sorted before parent folders. The reason is that child module export a module reference that the parent folder can then use to declare its dependencies.
+The plugin will then order the folders based on folder depth, so that child folders are sorted before parent folders.
+The reason is that child modules export a module reference that the parent folder can then use to declare its dependencies.
 
 ```javascript
 // people/speakers.controller.js

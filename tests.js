@@ -1,8 +1,5 @@
 var sort = require('./index');
 var sortFiles = sort.sortFiles;
-var sorter = sort.sorter;
-
-var basename = require('path').basename;
 
 var input = [{
     path: 'app.module.js'

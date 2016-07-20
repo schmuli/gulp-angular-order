@@ -1,8 +1,8 @@
-var path = require('path');
-var through = require('through2');
+let path = require('path');
+let through = require('through2');
 
 module.exports = function (options) {
-    var files = [];
+    let files = [];
 
     return through.obj(onFile, onEnd);
 
@@ -12,8 +12,8 @@ module.exports = function (options) {
     }
 
     function onEnd(cb) {
-        var sorted = sort(files, options);
-        for (var i = 0; i < sorted.length; i += 1) {
+        let sorted = sort(files, options);
+        for (let i = 0; i < sorted.length; i += 1) {
             this.push(sorted[i]);
         }
 
@@ -21,16 +21,17 @@ module.exports = function (options) {
     }
 };
 
+const TYPES = ['service', 'controller', 'directive', 'filter', 'routes', 'config', 'module'];
+
 module.exports.sortFiles = sort;
 
 function sort(files, options) {
     options = options || {};
-    var base = options.base || '';
-    var types = options.types || ['service', 'controller', 'directive', 'filter', 'module'];
-    var special = options.special || undefined;
+    let base = options.base || '';
+    let types = options.types || TYPES;
 
-    var sorting = [];
-    var indexed = {};
+    let sorting = [];
+    let indexed = {};
 
     files.forEach(function (file, index) {
         if (isSubpath(base, file.path)) {
@@ -40,11 +41,11 @@ function sort(files, options) {
         }
     });
 
-    let sorted = sortFiles(sorting, types, special);
+    let sorted = sortFiles(sorting, types, options.special);
 
-    var result = [];
-    for (var i = 0, sortedIndex = 0; i < files.length; i += 1) {
-        var file = indexed[i];
+    let result = [];
+    for (let i = 0, sortedIndex = 0; i < files.length; i += 1) {
+        let file = indexed[i];
         if (!file) {
             file = sorted[sortedIndex].file;
             sortedIndex += 1;
@@ -97,8 +98,31 @@ function buildTree(files) {
     return tree;
 }
 
-function recurseSort(parent, types, result) {
-    parent.folders.sort((a, b) => a.name.localeCompare(b.name));
+function specialSorter(a, b, special) {
+    let specialA = special.indexOf(a.name);
+    let specialB = special.indexOf(b.name);
+
+    if (specialA === -1 && specialB === -1) {
+        return 0;
+    }
+
+    if (specialA !== -1 && specialB !== -1) {
+        return specialA - specialB;
+    }
+
+    return specialA !== -1 ? -1 : 1;
+}
+
+function recurseSort(parent, types, result, special) {
+    parent.folders.sort((a, b) => {
+        if (special) {
+            let specialSort = specialSorter(a, b, special);
+            if (specialSort !== 0) {
+                return specialSort;
+            }
+        }
+        return a.name.localeCompare(b.name);
+    });
     parent.folders.forEach(folder => recurseSort(folder, types, result));
 
     parent.files.sort((a, b) => compareTypes(a.type, b.type, types));
@@ -108,38 +132,20 @@ function recurseSort(parent, types, result) {
 function sortTree(tree, types, special) {
     let result = [];
     recurseSort(tree, types, result, special);
-
-    if (special) {
-        result.sort((a, b) => {
-            let specialA = special.indexOf(a.dir[0]);
-            let specialB = special.indexOf(b.dir[0]);
-
-            if (specialA === -1 && specialB === -1) {
-                return 0;
-            }
-
-            if (specialA !== -1 && specialB !== -1) {
-                return specialA - specialB;
-            }
-
-            return specialA !== -1 ? -1 : 1;
-        });
-    }
-
     return result;
 }
 
 function compareTypes(typeA, typeB, types) {
-    var indexA = types.indexOf(typeA);
-    var indexB = types.indexOf(typeB);
+    let indexA = types.indexOf(typeA);
+    let indexB = types.indexOf(typeB);
     return indexA - indexB;
 }
 
 function stats(base, file) {
-    var relative = path.relative(base, file.path);
-    var dir = path.dirname(relative);
-    var name = path.basename(relative, '.js');
-    var extension = path.extname(name);
+    let relative = path.relative(base, file.path);
+    let dir = path.dirname(relative);
+    let name = path.basename(relative, '.js');
+    let extension = path.extname(name);
 
     return {
         file: file,
