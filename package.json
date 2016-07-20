@@ -1,24 +1,22 @@
 {
-  "name": "gulp-angular-order",
-  "description": "Gulp plugin to order Angular source files by directory and type",
-  "version": "1.0.0",
-  "author": "Schmulik Raskin <schmuli@gmail.com>",
-  "repository": "schmuli/gulp-angular-order",
-  "files": [
-    "index.js"
-  ],
-  "keywords": [
-    "gulpplugin"
-  ],
-  "dependencies": {
-    "through2": "^0.6.3"
-  },
-  "devDependencies": {},
-  "scripts": {},
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://github.com/wearefractal/gulp-concat/raw/master/LICENSE"
-    }
-  ]
+    "name": "gulp-angular-order",
+    "description": "Gulp plugin to order Angular source files by directory and type",
+    "version": "1.0.0",
+    "author": "Schmulik Raskin <schmuli@gmail.com>",
+    "repository": "schmuli/gulp-angular-order",
+    "files": [
+        "index.js"
+    ],
+    "keywords": [
+        "gulpplugin"
+    ],
+    "dependencies": {
+        "through2": "^2.0.1"
+    },
+    "devDependencies": {},
+    "scripts": {},
+    "licenses": [{
+        "type": "MIT",
+        "url": "http://github.com/wearefractal/gulp-concat/raw/master/LICENSE"
+    }]
 }
