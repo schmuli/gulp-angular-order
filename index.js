@@ -27,19 +27,20 @@ function sort(files, options) {
     options = options || {};
     var base = options.base || '';
     var types = options.types || ['service', 'controller', 'directive', 'filter', 'module'];
+    var special = options.special || undefined;
 
-    var sorted = [];
+    var sorting = [];
     var indexed = {};
 
     files.forEach(function (file, index) {
         if (isSubpath(base, file.path)) {
-            sorted.push(stats(base, file));
+            sorting.push(stats(base, file));
         } else {
             indexed[index] = file;
         }
     });
 
-    sorted.sort((a, b) => sortFile(a, b, types));
+    let sorted = sortFiles(sorting, types, special);
 
     var result = [];
     for (var i = 0, sortedIndex = 0; i < files.length; i += 1) {
@@ -59,17 +60,73 @@ function isSubpath(base, subpath) {
         .indexOf('..') === -1;
 }
 
-function sortFile(a, b, types) {
-    var dirSort = a.dir.localeCompare(b.dir);
-    if (dirSort !== 0) {
-        return -dirSort;
+function sortFiles(files, types, special) {
+    let tree = buildTree(files);
+    return sortTree(tree, types, special);
+}
+
+function findOrCreateFolder(dir, parent) {
+    for (let i = 0; i < dir.length; i += 1) {
+        let name = dir[i];
+        let folder = parent.folders.find(f => f.name === name);
+        if (!folder) {
+            folder = {
+                name,
+                files: [],
+                folders: []
+            };
+            parent.folders.push(folder);
+        }
+        parent = folder;
     }
-    var typeSort = compareTypes(a.type, b.type, types);
-    if (typeSort !== 0) {
-        return typeSort;
+
+    return parent;
+}
+
+function buildTree(files) {
+    let tree = {
+        files: [],
+        folders: []
+    };
+
+    files.forEach(file => {
+        folder = findOrCreateFolder(file.dir, tree);
+        folder.files.push(file);
+    });
+
+    return tree;
+}
+
+function recurseSort(parent, types, result) {
+    parent.folders.sort((a, b) => a.name.localeCompare(b.name));
+    parent.folders.forEach(folder => recurseSort(folder, types, result));
+
+    parent.files.sort((a, b) => compareTypes(a.type, b.type, types));
+    parent.files.forEach(file => result.push(file));
+}
+
+function sortTree(tree, types, special) {
+    let result = [];
+    recurseSort(tree, types, result, special);
+
+    if (special) {
+        result.sort((a, b) => {
+            let specialA = special.indexOf(a.dir[0]);
+            let specialB = special.indexOf(b.dir[0]);
+
+            if (specialA === -1 && specialB === -1) {
+                return 0;
+            }
+
+            if (specialA !== -1 && specialB !== -1) {
+                return specialA - specialB;
+            }
+
+            return specialA !== -1 ? -1 : 1;
+        });
     }
-    var nameSort = a.name.localeCompare(b.name);
-    return nameSort;
+
+    return result;
 }
 
 function compareTypes(typeA, typeB, types) {
@@ -86,7 +143,7 @@ function stats(base, file) {
 
     return {
         file: file,
-        dir: dir !== '.' ? dir : String.fromCharCode(0x32),
+        dir: dir !== '.' ? dir.split(path.sep) : [],
         name: name,
         type: name !== 'module' ? extension.substr(1) : name
     };
