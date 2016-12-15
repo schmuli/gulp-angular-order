@@ -87,6 +87,7 @@ function findOrCreateFolder(dir, parent) {
 }
 
 function buildTree(files) {
+    let folder;
     let tree = {
         files: [],
         folders: []
