@@ -1,7 +1,7 @@
 {
   "name": "gulp-angular-order",
   "description": "Gulp plugin to order Angular source files by directory and type",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "author": "Schmulik Raskin <schmuli@gmail.com>",
   "repository": "schmuli/gulp-angular-order",
   "files": [
